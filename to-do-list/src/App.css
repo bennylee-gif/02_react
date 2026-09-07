@@ -1,0 +1,247 @@
+/* ==========================================
+   1. 애니메이션 & 기본 레이아웃 (App)
+   ========================================== */
+
+@keyframes slideInNext {
+  from { transform: translateX(25px); opacity: 0.4; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInPrev {
+  from { transform: translateX(-25px); opacity: 0.4; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.page-animation-next { 
+  animation: slideInNext 0.25s ease-out forwards; 
+}
+
+.page-animation-prev { 
+  animation: slideInPrev 0.25s ease-out forwards; 
+}
+
+/* 전체 배경 레이아웃 */
+.app-container {
+  padding: 40px 20px;
+  min-height: 100vh;
+  background-color: #f4f4f6;
+  font-family: sans-serif;
+}
+
+/* 다이어리 종이 용지 커버 */
+.diary-paper {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  box-shadow:
+    -3px 3px 0 #f0f0f0, 
+    -4px 4px 0 #ccc, 
+    -7px 7px 0 #fff, 
+    -8px 8px 0 #ccc, 
+    4px 4px 0 #fff, 
+    5px 5px 0 #ccc, 
+    0 10px 20px rgba(0,0,0,0.12);
+}
+
+
+/* ==========================================
+   2. 헤더 컴포넌트 (Header)
+   ========================================== */
+
+.header-container {
+  border-bottom: 2px solid #333;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+/* 상단: 날짜 선택 & 오늘 버튼 */
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.date-picker-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.date-input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: 13px;
+}
+
+.day-of-week {
+  font-size: 13px;
+  font-weight: bold;
+  color: #555;
+}
+
+.btn-today {
+  font-size: 12px;
+  padding: 4px 8px;
+  cursor: pointer;
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+}
+
+/* 중앙: 이전/다음 버튼 & 타이틀 */
+.header-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-nav {
+  background: #fff;
+  border: 1px solid #bbb;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.header-title {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: 2px;
+  text-align: center;
+}
+/* ==========================================
+   3. 할 일 추가 컴포넌트 (CreateTodo)
+   ========================================== */
+
+.create-todo-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.create-todo-input {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  outline: none;
+  font-size: 15px;
+}
+
+.create-todo-btn {
+  padding: 6px 12px;
+  cursor: pointer;
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+}
+
+/* ==========================================
+   4. 메모 박스 컴포넌트 (MemoBox)
+   ========================================== */
+
+.memo-box-container {
+  margin-top: 20px;
+  border: 1px dashed #aaa;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: #fafafa;
+}
+
+.memo-box-title {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.memo-box-textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   5. 할 일 아이템 컴포넌트 (TodoItem)
+   ========================================== */
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 8px;
+  border-bottom: 1px solid #aaa;
+  margin-bottom: 6px;
+  font-size: 15px;
+  background-color: #fff;
+  cursor: grab;
+}
+
+.drag-handle {
+  color: #aaa;
+  margin-right: 8px;
+  cursor: grab;
+  user-select: none;
+}
+
+.star-btn {
+  cursor: pointer;
+  margin-right: 8px;
+  user-select: none;
+  color: #ccc;
+}
+
+.star-btn.active {
+  color: #fcc419;
+}
+
+.done-btn {
+  cursor: pointer;
+  margin-right: 10px;
+  user-select: none;
+}
+
+/* 중요 표시(별표) 설정 시 글씨 굵게 */
+.todo-text.starred {
+  font-weight: bold;
+}
+
+.todo-text {
+  flex: 1;
+  color: #000;
+}
+
+.todo-text.completed {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.delete-btn {
+  border: none;
+  background: transparent;
+  color: #ff4d4f;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* ==========================================
+   6. 할 일 리스트 컴포넌트 (TodoList)
+   ========================================== */
+
+.todo-list-container {
+  min-height: 220px;
+}
