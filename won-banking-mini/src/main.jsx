@@ -10,7 +10,7 @@ root.render(
   </StrictMode>,
 )
 
-// // main.jsx 에서 1초마다 다시 그리기
+// // // main.jsx 에서 1초마다 다시 그리기
 // setInterval(() => {
 //   root.render(<App />);
 // }, 1000);

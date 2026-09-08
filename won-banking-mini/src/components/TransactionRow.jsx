@@ -1,3 +1,4 @@
+// 1. 필요로 하는 모듈들을 import 
 import { formatWonMasked } from "../utils/format.js"
 
 // 거래 내역 한 줄을 보여주는 컴포넌트
