@@ -17,6 +17,7 @@ function CreateTodo({ onCreate }) {
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="새 할 일을 입력하세요..."
+        maxLength={50}
         className="create-todo-input"
       />
       <button type="submit" className="create-todo-btn">

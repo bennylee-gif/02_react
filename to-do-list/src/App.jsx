@@ -1,32 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import CreateTodo from './components/CreateTodo';
 import TodoList from './components/TodoList';
 import MemoBox from './components/MemoBox';
-import './App.css'; // CSS 파일 불러오기
+import './App.css';
+
+// useState 초기화 시 참조하기 위해 getDateKey를 컴포넌트 바깥으로 이동
+const getDateKey = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [direction, setDirection] = useState('next');
 
-  const getDateKey = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
   const dateKey = getDateKey(currentDate);
 
-  const [pagesData, setPagesData] = useState({
-    [dateKey]: {
-      todos: [
-        { id: 1, text: '좌우 화살표(◀ ▶)로 페이지 넘겨보기', isStar: true, isDone: false },
-        { id: 2, text: '드래그해서 순서 변경해보기', isStar: false, isDone: false },
-      ],
-      memo: '',
-    },
+  // 1. 앱 시작 시 localStorage에 저장된 데이터 불러오기
+  const [pagesData, setPagesData] = useState(() => {
+    const saved = localStorage.getItem('pagesData');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (error) {
+        console.error('저장된 데이터를 불러오는 데 실패했습니다.', error);
+      }
+    }
+    // 저장된 데이터가 없을 때의 초기값
+    return {
+      [getDateKey(new Date())]: {
+        todos: [
+          { id: 1, text: '좌우 화살표(◀ ▶)로 페이지 넘겨보기', isStar: true, isDone: false },
+          { id: 2, text: '드래그해서 순서 변경해보기', isStar: false, isDone: false },
+        ],
+        memo: '',
+      },
+    };
   });
+
+  // 2. pagesData가 변경될 때마다 localStorage에 자동 저장
+  useEffect(() => {
+    localStorage.setItem('pagesData', JSON.stringify(pagesData));
+  }, [pagesData]);
 
   const currentPage = pagesData[dateKey] || { todos: [], memo: '' };
   const todos = currentPage.todos;
@@ -57,18 +75,22 @@ function App() {
   };
 
   const handleSelectDate = (date) => {
-    setDirection(date > currentDate ? 'next' : 'prev');
+    const targetKey = getDateKey(date);
+    const currentKey = getDateKey(currentDate);
+    setDirection(targetKey >= currentKey ? 'next' : 'prev');
     setCurrentDate(date);
   };
 
   const handleToday = () => {
     const today = new Date();
-    setDirection(today > currentDate ? 'next' : 'prev');
+    const todayKey = getDateKey(today);
+    const currentKey = getDateKey(currentDate);
+    setDirection(todayKey >= currentKey ? 'next' : 'prev');
     setCurrentDate(today);
   };
 
   const handleCreate = (text) => {
-    const newTodo = { id: Date.now(), text, isStar: false, isDone: false };
+    const newTodo = { id: crypto.randomUUID(), text, isStar: false, isDone: false };
     updateCurrentPage([...todos, newTodo], memo);
   };
 
@@ -108,6 +130,7 @@ function App() {
           onToday={handleToday}
           onPrevDay={handlePrevDay}
           onNextDay={handleNextDay}
+          todos={todos}
         />
         <CreateTodo onCreate={handleCreate} />
         <TodoList

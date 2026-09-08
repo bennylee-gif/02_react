@@ -1,7 +1,6 @@
 import React from 'react';
-import './Header.css';
 
-function Header({ currentDate, onSelectDate, onToday, onPrevDay, onNextDay }) {
+function Header({ currentDate, onSelectDate, onToday, onPrevDay, onNextDay, todos = [] }) {
   const formatDateForInput = (date) => {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -11,6 +10,17 @@ function Header({ currentDate, onSelectDate, onToday, onPrevDay, onNextDay }) {
 
   const dayOfWeek = currentDate.toLocaleDateString('ko-KR', { weekday: 'short' });
 
+  const handleDateChange = (e) => {
+    if (!e.target.value) return;
+    const [year, month, day] = e.target.value.split('-').map(Number);
+    onSelectDate(new Date(year, month - 1, day));
+  };
+
+  // 달성률 계산 로직
+  const totalCount = todos.length;
+  const completedCount = todos.filter((t) => t.isDone).length;
+  const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
   return (
     <div className="header-container">
       {/* 1. 상단: 좌측 날짜 선택창 & 우측 오늘 버튼 */}
@@ -19,7 +29,7 @@ function Header({ currentDate, onSelectDate, onToday, onPrevDay, onNextDay }) {
           <input
             type="date"
             value={formatDateForInput(currentDate)}
-            onChange={(e) => e.target.value && onSelectDate(new Date(e.target.value + 'T00:00:00'))}
+            onChange={handleDateChange}
             className="date-input"
           />
           <span className="day-of-week">({dayOfWeek})</span>
@@ -49,6 +59,20 @@ function Header({ currentDate, onSelectDate, onToday, onPrevDay, onNextDay }) {
         >
           ▶
         </button>
+      </div>
+
+      {/* 3. 하단: 달성률 진행 바 (Progress Bar) */}
+      <div className="progress-container">
+        <div className="progress-info">
+          <span>오늘의 달성률</span>
+          <span>{percentage}% ({completedCount}/{totalCount})</span>
+        </div>
+        <div className="progress-bar-background">
+          <div
+            className="progress-bar-fill"
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
       </div>
     </div>
   );
