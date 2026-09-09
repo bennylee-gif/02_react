@@ -7,10 +7,12 @@ import Header from './components/Header'
 import Counter from './components/Counter.jsx'
 import { useState } from 'react'
 import TransactionRow from './components/TransactionRow.jsx'
-import { transactions } from './data/mockData'
+import { transactions as initialTransactions } from './data/mockData'
 import { formatWon } from './utils/format.js'
 import ExchangeRate from './components/ExchangeRate.jsx'
 import TransactionList from './components/TransactionList.jsx'
+import { UserProvider } from './contexts/UserContext.jsx'
+import TransferForm from './components/TransferForm.jsx' // 추가
 
 // 02_html기초.html 안에 만들었던 계좌카드의 css를 가져와서
 // 아래에 있는 카드를 좀더 그럴듯하게 꾸며보세요.
@@ -60,6 +62,10 @@ function App() {
   // 고객에 관한 전체 정보를 한 번 불러와서 state로 관리
   const [accounts, setAccounts] = useState(initialAccounts);
 
+  	// 추가: 이 state 가 바뀌고, 그 값을 props 로 받는 TransactionList가 그려집니다
+    // 거래내역ㅇ르 처음에 한 번 전체 정보로 불러와서 여러 하위 컴포넌트를 감싼
+  const [transactions, setTransactions] = useState(initialTransactions);
+
   // accounts의 특정 위치의 balance를 변경하는 함수
   // accountId라는 고유key로 특정 고객의 balance를 변경
   // 입력받은 accountId가 일치하는 고객의 계좌 dict에서만
@@ -72,6 +78,34 @@ function App() {
     )
   }
 
+   // 추가: 이체 폼(TransferForm)에서 이체 버튼을 누르면 이 함수가 실행됩니다.
+  // 계좌 잔액과 거래내역, 이 두 state 를 한 번에 갱신하는 것이 이번 세션의 핵심입니다.
+  function handleTransfer({ toAccount, amount, memo }) {
+    const from = accounts[0]
+    const nextBalance = from.balance - amount
+
+    setAccounts((prev) =>
+      prev.map((a) =>
+        a.accountId === from.accountId ? { ...a, balance: nextBalance } : a
+      )
+    )
+
+    setTransactions((prev) => [
+      {
+        txId: Date.now(),  // 현재 시간 UNIXTIME으로 timestamp
+        accountId: from.accountId,
+        txType: "출금",
+        amount,
+        balanceAfter: nextBalance,
+        category: "이체",
+        memo: memo || "이체",
+        counterparty: toAccount,
+        txDatetime: new Date().toISOString().slice(0, 19),
+      },
+      ...prev, // 새 거래를 맨 앞에
+    ])
+  }
+
   // 합계를 state로 두지 않습니다. component 안에서의 각각의 상태값이 아니고
   // App에서 매번 다시 계산하는 변수
   const totalBalance = accounts[0].balance + accounts[1].balance + accounts[2].balance
@@ -82,6 +116,7 @@ function App() {
   // return 뒤에 렌더링 될 부분을 적습니다.
   return (
     <> 
+    <UserProvider user={{ name: "김연지", grade: "우수" }}>    
     <Header />
 
     <button onClick={() => setShowFullNo(!showFullNo)}>
@@ -98,23 +133,38 @@ function App() {
     <Clock />
     {/* class 는 JS의 예약어이므로 JSX에서는 className으로 대신 사용합니다.*/}
 
+    {/* 추가 */}
+    <Panel title="이체">
+      <TransferForm fromAccount={accounts[0]} onTransfer={handleTransfer} />
+    </Panel>
+     
     <div className="total">
       <p> 총 자산 </p>
       <p> {formatWon(totalBalance) } </p>
     </div>
     {/* 사용 */}
 
-    <Panel title="내 계좌">
+    <Panel title={'내 계좌'}>
       {accounts.map((account) => (
-        <AccountCard key={account.accountId} 
-                    showFullNo={showFullNo}
-                    showAmount={showAmount}
-                    onDeposit={() => handleDeposit(account.accountId)} 
-                    accountNo={account.accountNo}
-                    accountType={account.accountType} 
-                    balance={account.balance}
-                    status={account.status}  
-                     />
+        // 계좌마다 UserProvider를 만들어
+        // 해당 계좌의 status를 Context로 전달합니다.
+        <UserProvider
+          key={account.accountId}
+          user={{
+            name: "김연지",
+            grade: "우수",
+            status: account.status,
+          }}
+        >
+          <AccountCard key={account.accountId} 
+                      showFullNo={showFullNo}
+                      showAmount={showAmount}
+                      onDeposit={() => handleDeposit(account.accountId)} 
+                      accountNo={account.accountNo}
+                      accountType={account.accountType} 
+                      balance={account.balance}
+                       />
+        </UserProvider>
         ))}
     </Panel>
 
@@ -125,12 +175,13 @@ function App() {
     txType, amount, category, memo, counterparty, txDatetime, hideAmount  */}
 
     <Panel title="최근 거래">
-      <TransactionList showAmount={showAmount} />
+      <TransactionList transactions={transactions} showAmount={showAmount} />
     </Panel>
 
     <Panel title="오늘의 환율"> 
      <ExchangeRate />
     </Panel>
+    </UserProvider>
     </>
   );
 }

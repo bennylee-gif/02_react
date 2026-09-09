@@ -9,8 +9,10 @@ export function formatWon(amount) {
 
 // 계좌번호 앞부분을 가리고 마지막 한 자리만 보여주는 함수
 // 예) "1002-345-678901" -> "1002-345-6****1"
-export function maskAccountNo(no) {
-  return no.slice(0, -5) + "****" + no.slice(-1)
+// utils/format.js (13번째 줄 부근)
+export function maskAccountNo(accountNo) {
+  if (!accountNo) return ""; // undefined나 null 들어올 경우 방어
+  return accountNo.slice(0, 8) + "****"; // 기존 로직
 }
 
 // hide 가 true 면 실제 금액 대신 "••••••원" 을 보여줍니다.
