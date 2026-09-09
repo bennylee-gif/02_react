@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import TransactionRow from './TransactionRow'
-import { fetchTransactions } from '../api/exchange'
-import { useFetch } from '../hooks/useFetch.js'
 import { formatWon } from '../utils/format.js'
 
 const TYPE_OPTIONS = ["전체", "입금", "출금"]
