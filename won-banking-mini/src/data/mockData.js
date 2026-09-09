@@ -1,5 +1,3 @@
-
-
 // 최근 거래 내역 (계좌 1번의 거래만 예시로 담았습니다)
 export const transactions = [
   {
